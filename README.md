@@ -40,6 +40,7 @@ Additionally, the script securely deletes outdated files while maintaining a min
 - **📂 Complete Vault Management**: Deletes folders, items, and attachments in the destination before restoring.
 - **😊 Compatibility**: Uses Bitwarden API Key for secure vault access.
 - **✒️ Self-Signed certificate**: Supports self-signed certificates for local domain.
+- ❌ Does not support attachments backup
 
 ## How It Works
 
