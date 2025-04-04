@@ -12,6 +12,7 @@ Automate backup and restore between Bitwarden and/or Vaultwarden vault.
 - [Description](#description)
 - [Features](#features)
 - [How It Works](#how-it-works)
+- [Manual Recovery Process](#manual-recovery-process)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -41,6 +42,7 @@ Additionally, the script securely deletes outdated files while maintaining a min
 - **😊 Compatibility**: Uses Bitwarden API Key for secure vault access.
 - **✒️ Self-Signed certificate**: Supports self-signed certificates for local domain.
 - ❌ Does not support attachments backup
+- **🔄 Manual Recovery**: Allows manual decryption and import of backups into a Bitwarden or Vaultwarden vault, facilitating data recovery if needed.
 
 ## How It Works
 
@@ -56,6 +58,25 @@ Additionally, the script securely deletes outdated files while maintaining a min
 3. **Destination Vault Restore**
    - Decrypts the latest source vault backup.
    - Imports the decrypted backup into the destination vault.
+
+## Manual Recovery Process
+To restore your vault from the encrypted backup files, follow these instructions:
+
+1. **Locate the Encrypted Backup File**  
+   Ensure you have the latest encrypted backup file, which should be in the format `<BACKUP_FILE.enc>`.
+
+2. **Decrypt the Backup**  
+   Open your terminal and run the following command to decrypt the backup:
+   ```bash
+   openssl enc -aes-256-cbc -d -pbkdf2 -pass pass:"<YOUR_ENCRYPTION_PASSWORD>" -in "<BACKUP_FILE.enc>" -out "<output_file_name.json>"
+
+  - Replace `<YOUR_ENCRYPTION_PASSWORD>` with the password you used to encrypt the backup.
+  - Replace `<BACKUP_FILE.enc>` with the name of your encrypted backup file.
+  - Replace `<output_file_name.json>` with the desired name for the decrypted JSON output file.
+
+3. **Import the Decrypted File**  
+   After executing the command, the decrypted JSON file will be created in your current directory. You can then import this JSON file into your Bitwarden or Vaultwarden vault.  
+   **Note**: If the vault already contains the same items, duplicates will be added to the vault.
 
 
 ## Environment Variables
