@@ -104,6 +104,14 @@ purge_folder() {
     echo "# Purge completed for $folder_name."
 }
 
+cleanup_unencrypted() {
+    echo "# Cleaning up all unencrypted backup files from temporary folder ($TEMP_FOLDER)..."
+    rm -f "$TEMP_FOLDER"/*.json
+}
+
+# Set traps to ensure cleanup is performed on exit or error
+trap cleanup_unencrypted SIGINT SIGTERM EXIT
+
 
 #------#
 # INIT #
@@ -127,6 +135,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Create temporary folder for unencrypted files
+TEMP_FOLDER="/tmp/bitwarden_unencrypted"
+mkdir -p "$TEMP_FOLDER"
+if [ $? -ne 0 ]; then
+    echo "✕ Error: Failed to create temporary folder $TEMP_FOLDER."
+    exit 1
+fi
+
+# Clean up any existing unencrypted backup files from TEMP_FOLDER
+echo "# Cleaning up any existing unencrypted backup files..."
+rm -f "$TEMP_FOLDER"/*.json
+
 echo "########## Start of Backup process ##########"
 
 echo "# Fixing permissions on backups folder..."
@@ -144,8 +164,10 @@ echo "# Start Time: $(date)"
 # Set the filename for our json export as variable
 SOURCE_EXPORT_OUTPUT_BASE="bw_export_source_"
 SOURCE_NEW_FILENAME="$SOURCE_EXPORT_OUTPUT_BASE$TIMESTAMP.json"
-SOURCE_OUTPUT_FILE_PATH="$SOURCE_FOLDER/$SOURCE_NEW_FILENAME"
-ENCRYPTED_SOURCE_OUTPUT_FILE_PATH="$SOURCE_OUTPUT_FILE_PATH.enc"
+# Unencrypted file stored in temporary folder
+SOURCE_OUTPUT_FILE_PATH="$TEMP_FOLDER/$SOURCE_NEW_FILENAME"
+# Encrypted file stored in source backup folder
+ENCRYPTED_SOURCE_OUTPUT_FILE_PATH="$SOURCE_FOLDER/$SOURCE_NEW_FILENAME.enc"
 
 
 #--------------#
@@ -252,9 +274,11 @@ echo "########## Start of Restore process ##########"
 
 # We want to remove items later, so we set a base filename now
 DEST_EXPORT_OUTPUT_BASE="bw_export_dest_"
-DEST_NEW_FILENAME="$DEST_EXPORT_OUTPUT_BASE$TIMESTAMP.json" #DEST_OUTPUT_FILE
-DEST_OUTPUT_FILE_PATH="$DEST_FOLDER/$DEST_NEW_FILENAME"
-ENCRYPTED_DEST_OUTPUT_FILE_PATH="$DEST_OUTPUT_FILE_PATH.enc"
+DEST_NEW_FILENAME="$DEST_EXPORT_OUTPUT_BASE$TIMESTAMP.json"
+# Unencrypted file stored in temporary folder
+DEST_OUTPUT_FILE_PATH="$TEMP_FOLDER/$DEST_NEW_FILENAME"
+# Encrypted file stored in destination backup folder
+ENCRYPTED_DEST_OUTPUT_FILE_PATH="$DEST_FOLDER/$DEST_NEW_FILENAME.enc"
 
 
 #------------#
@@ -270,7 +294,6 @@ sleep 1
 
 export BW_CLIENTID=${DEST_CLIENT_ID}
 export BW_CLIENTSECRET=${DEST_CLIENT_SECRET}
-
 
 # Login to our Server
 echo "# Logging into Dest server..."
@@ -363,12 +386,12 @@ if [ -z "$total_items" ] || [ "$total_items" -eq 0 ]; then
 else
     current_item=0
 
-    # Loop sugli ID con progresso
+    # Loop on IDs with progress
     for id in $(jq -r '.items[]? | .id' "$DEST_OUTPUT_FILE_PATH"); do
         current_item=$((current_item + 1))
         echo "# Deleting item [$current_item/$total_items]"
 
-        # Rimuovi l'elemento
+        # Remove item
         bw --session "$DEST_SESSION" --raw delete -p item "$id"
     done
 
@@ -385,12 +408,12 @@ if [ -z "$total_attach" ] || [ "$total_attach" -eq 0 ]; then
 else
     current_attach=0
 
-    # Loop sugli ID con progresso
+    # Loop on IDs with progress
     for id in $(jq -r '.attachments[]? | .id' "$DEST_OUTPUT_FILE_PATH"); do
         current_attach=$((current_attach + 1))
         echo "# Deleting attachment [$current_attach/$total_attach]"
 
-        # Rimuovi l'elemento
+        # Remove attachment
         bw --session "$DEST_SESSION" --raw delete -p attachment "$id"
     done
 
@@ -411,8 +434,10 @@ sleep 1
 # DEST IMPORT SOURCE BACKUP #
 #---------------------------#
 
-DEST_LATEST_BACKUP="$ENCRYPTED_SOURCE_OUTPUT_FILE_PATH" #Latest source backup encrypted
-DECRYPTED_SOURCE_OUTPUT_FILE_PATH="$SOURCE_OUTPUT_FILE_PATH" #Latest source backup
+# Restoring from source backup (encrypted)
+DEST_LATEST_BACKUP="$ENCRYPTED_SOURCE_OUTPUT_FILE_PATH"
+# Decrypted file stored in temporary folder
+DECRYPTED_SOURCE_OUTPUT_FILE_PATH="$TEMP_FOLDER/$SOURCE_NEW_FILENAME"
 
 # Decrypt the latest backup
 echo "# Decrypting the latest backup..."
