@@ -5,7 +5,7 @@ Automate backup and restore between Bitwarden and/or Vaultwarden vault.
   <img src="logo.png" alt=""/>
 </p>
 
-[![Docker Image - 1.0.1](https://img.shields.io/docker/v/reaper0x1/bitwarden-portal/latest?logo=docker&label=Docker%20Image)](https://hub.docker.com/r/reaper0x1/bitwarden-portal)
+![Docker Image Version](https://img.shields.io/docker/v/reaper0x1/bitwarden-portal?label=Docker%20Image)
 [![Github - Official](https://img.shields.io/badge/Github-Official-2dba4e?logo=github)](https://github.com/Reaper0x1/bitwarden-portal)
 
 ## Table of Contents
