@@ -12,8 +12,7 @@
         pkgs = import nixpkgs {
           inherit system;
         };
-      in {
-        packages.default = pkgs.stdenv.mkDerivation {
+        bitwarden-portal = pkgs.stdenv.mkDerivation {
           pname = "bitwarden-portal";
           version = "1.0.0";
 
@@ -40,9 +39,14 @@
 
           installPhase = ''
             mkdir -p $out/bin
-            cp bitwarden-portal.sh $out/bin/
+            cp bitwarden-portal.sh $out/bin/bitwarden-portal
             chmod +x $out/bin/bitwarden-portal
           '';
+        };
+      in {
+        packages.default = bitwarden-portal;
+        overlays.default = final: prev: {
+            bitwarden-portal = bitwarden-portal;
         };
       });
 }
