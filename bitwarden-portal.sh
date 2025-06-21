@@ -118,8 +118,6 @@ trap cleanup_unencrypted SIGINT SIGTERM EXIT
 #------#
 
 # Create folder if not exists 
-SOURCE_FOLDER="/app/backups/source"
-DEST_FOLDER="/app/backups/dest"
 
 mkdir -p "$SOURCE_FOLDER"
 
@@ -344,7 +342,7 @@ fix_permissions "$PUID" "$PGID" "$DEST_OUTPUT_FILE_PATH"
 
 # Encrypt the exported file
 echo "# Encrypting exported file..."
-encrypt_file "$DEST_OUTPUT_FILE_PATH" "$ENCRYPTED_DEST_OUTPUT_FILE_PATH" "$ENCRYPTION_PASSWORD"
+encrypt_file "$DEST_OUTPUT_FILE_PATH" "$ENCRYPTED_DEST_OUTPUT_FILE_PATH" "$(base64 -d $ENCRYPTION_PASSWORD)"
 fix_permissions "$PUID" "$PGID" "$ENCRYPTED_DEST_OUTPUT_FILE_PATH"
 
 sleep 1
@@ -441,7 +439,7 @@ DECRYPTED_SOURCE_OUTPUT_FILE_PATH="$TEMP_FOLDER/$SOURCE_NEW_FILENAME"
 
 # Decrypt the latest backup
 echo "# Decrypting the latest backup..."
-decrypt_file "$DEST_LATEST_BACKUP" "$DECRYPTED_SOURCE_OUTPUT_FILE_PATH" "$ENCRYPTION_PASSWORD"
+decrypt_file "$DEST_LATEST_BACKUP" "$DECRYPTED_SOURCE_OUTPUT_FILE_PATH" "$(base64 -d $ENCRYPTION_PASSWORD)"
 fix_permissions "$PUID" "$PGID" "$DECRYPTED_SOURCE_OUTPUT_FILE_PATH"
 
 
