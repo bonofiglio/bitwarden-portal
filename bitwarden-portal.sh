@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export BITWARDENCLI_APPDATA_DIR="$DATA_DIR"
+
 TIMESTAMP=$(date "+%Y-%m-%d_%H-%M-%S")
 
 #-------------------#
