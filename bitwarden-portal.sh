@@ -130,7 +130,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create temporary folder for unencrypted files
-TEMP_FOLDER="/tmp/bitwarden_unencrypted"
+TEMP_FOLDER="$(mktemp -d)"
 mkdir -p "$TEMP_FOLDER"
 if [ $? -ne 0 ]; then
     echo "✕ Error: Failed to create temporary folder $TEMP_FOLDER."
