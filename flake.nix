@@ -18,7 +18,7 @@
 
           src = ./.;
 
-          buildInputs = with pkgs; [
+          runtimeInputs = with pkgs; [
             python314
             curlMinimal
             bash
