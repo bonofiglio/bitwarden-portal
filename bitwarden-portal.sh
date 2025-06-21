@@ -205,7 +205,7 @@ printf '\n'
 
 # By using an API Key, we need to unlock the vault to get a sessionID
 echo "# Unlocking the vault..."
-SOURCE_SESSION=$(bw unlock "$(< $SOURCE_PASSWORD)" --raw)
+SOURCE_SESSION=$(bw unlock "$(base64 -d $SOURCE_PASSWORD)" --raw)
 
 if [ -z "$SOURCE_SESSION" ]; then
     echo "✕ Error: No source session retrieved. Check your source credentials and try again."
@@ -310,7 +310,7 @@ printf '\n'
 
 # By using an API Key, we need to unlock the vault to get a sessionID
 echo "# Unlocking the vault..."
-DEST_SESSION=$(bw unlock "$(< $DEST_PASSWORD)" --raw)
+DEST_SESSION=$(bw unlock "$(base64 -d $DEST_PASSWORD)" --raw)
 
 if [ -z "$DEST_SESSION" ]; then
     echo "✕ Error: No destination session retrieved. Check your destination credentials and try again."
