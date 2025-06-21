@@ -20,6 +20,8 @@
 
               src = ./.;
 
+              nativeBuildInputs = [ pkgs.makeWrapper ];
+
               installPhase = ''
                 mkdir -p $out/bin
                 cp bitwarden-portal.sh $out/bin/bitwarden-portal
