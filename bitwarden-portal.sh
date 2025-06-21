@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "RUNNING AS USER: $(whoami)"
+
 export BITWARDENCLI_APPDATA_DIR="$DATA_DIR"
 
 TIMESTAMP=$(date "+%Y-%m-%d_%H-%M-%S")
@@ -134,6 +136,8 @@ if [ $? -ne 0 ]; then
     echo "✕ Error: Failed to create temporary folder $TEMP_FOLDER."
     exit 1
 fi
+
+fix_permissions "$PUID" "$PGID" "$TEMP_FOLDER"
 
 # Clean up any existing unencrypted backup files from TEMP_FOLDER
 echo "# Cleaning up any existing unencrypted backup files..."
