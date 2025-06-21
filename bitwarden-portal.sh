@@ -20,10 +20,7 @@ encrypt_file() {
     local output_file="$2"
     local password="$3"
 
-    local input_file_name=$(echo "$input_file" | sed 's/\/app\///g')
-    local output_file_name=$(echo "$output_file" | sed 's/\/app\///g')
-
-    echo "# Encrypting file: $input_file_name."
+    echo "# Encrypting file: $input_file."
 
     openssl enc -aes-256-cbc -salt -pbkdf2 -pass pass:"$password" -in "$input_file" -out "$output_file"
 
@@ -32,7 +29,7 @@ encrypt_file() {
         exit 1
     fi
     
-    echo "# Encryption successful: $output_file_name."
+    echo "# Encryption successful: $output_file."
 }
 
 decrypt_file() {
@@ -40,10 +37,7 @@ decrypt_file() {
     local output_file="$2"
     local password="$3"
 
-    local input_file_name=$(echo "$input_file" | sed 's/\/app\///g')
-    local output_file_name=$(echo "$output_file" | sed 's/\/app\///g')
-
-    echo "# Decrypting file: $input_file_name."
+    echo "# Decrypting file: $input_file."
 
     openssl enc -aes-256-cbc -d -pbkdf2 -pass pass:"$password" -in "$input_file" -out "$output_file"
 
@@ -52,15 +46,13 @@ decrypt_file() {
         exit 1
     fi
 
-    echo "# Decryption successful: $output_file_name."
+    echo "# Decryption successful: $output_file."
 }
 
 purge_folder() {
     local folder_path="$1"
     local max_files="$2"
     local retention_days="$3"
-
-    local folder_name=$(echo "$folder_path" | sed 's/\/app\///g')
 
     if [ "$ENABLE_PRUNING" == "false" ]; then
         echo "# Pruning disabled, skipping..."
@@ -70,7 +62,7 @@ purge_folder() {
         exit 1
     fi
 
-    echo "# Purging files in folder: $folder_name."
+    echo "# Purging files in folder: $folder_path."
 
     # Find all files in the folder sorted by modification time (oldest first)
     all_files=$(find "$folder_path" -type f -printf "%T@ %p\n" | sort -n)
@@ -101,7 +93,7 @@ purge_folder() {
         echo "$all_files" | head -n -"$max_files" | awk '{print $2}' | xargs -I{} rm -f "{}"
     fi
 
-    echo "# Purge completed for $folder_name."
+    echo "# Purge completed for $folder_path."
 }
 
 cleanup_unencrypted() {
@@ -147,8 +139,9 @@ rm -f "$TEMP_FOLDER"/*.json
 
 echo "########## Start of Backup process ##########"
 
-echo "# Fixing permissions on backups folder..."
-fix_permissions "$PUID" "$PGID" "/app/backups"
+echo "# Fixing permissions on backups folders..."
+fix_permissions "$PUID" "$PGID" "$SOURCE_FOLDER"
+fix_permissions "$PUID" "$PGID" "$DEST_FOLDER"
 
 sleep 1
 
