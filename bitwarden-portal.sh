@@ -237,7 +237,7 @@ fix_permissions "$PUID" "$PGID" "$SOURCE_OUTPUT_FILE_PATH"
 #-----------------------#
 
 # Encrypt the exported file
-encrypt_file "$SOURCE_OUTPUT_FILE_PATH" "$ENCRYPTED_SOURCE_OUTPUT_FILE_PATH" "$ENCRYPTION_PASSWORD"
+encrypt_file "$SOURCE_OUTPUT_FILE_PATH" "$ENCRYPTED_SOURCE_OUTPUT_FILE_PATH" "$(base64 -d $ENCRYPTION_PASSWORD)"
 fix_permissions "$PUID" "$PGID" "$ENCRYPTED_SOURCE_OUTPUT_FILE_PATH"
 
 # Remove the unencrypted file
