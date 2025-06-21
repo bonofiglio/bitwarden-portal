@@ -186,8 +186,8 @@ sleep 1
 echo "# Logging out from Bitwarden..."
 bw logout >/dev/null
 
-export BW_CLIENTID=${SOURCE_CLIENT_ID}
-export BW_CLIENTSECRET=${SOURCE_CLIENT_SECRET}
+export BW_CLIENTID="$(< $SOURCE_CLIENT_ID)"
+export BW_CLIENTSECRET=$(< $SOURCE_CLIENT_SECRET)
 
 # Login to our Server
 echo "# Logging into Source server..."
@@ -205,7 +205,7 @@ printf '\n'
 
 # By using an API Key, we need to unlock the vault to get a sessionID
 echo "# Unlocking the vault..."
-SOURCE_SESSION=$(bw unlock "$SOURCE_PASSWORD" --raw)
+SOURCE_SESSION=$(bw unlock "$(< $SOURCE_PASSWORD)" --raw)
 
 if [ -z "$SOURCE_SESSION" ]; then
     echo "✕ Error: No source session retrieved. Check your source credentials and try again."
@@ -292,8 +292,8 @@ sleep 1
 # DEST LOGIN #
 #------------#
 
-export BW_CLIENTID=${DEST_CLIENT_ID}
-export BW_CLIENTSECRET=${DEST_CLIENT_SECRET}
+export BW_CLIENTID=$(< $DEST_CLIENT_ID)
+export BW_CLIENTSECRET=$(< $DEST_CLIENT_SECRET)
 
 # Login to our Server
 echo "# Logging into Dest server..."
@@ -310,7 +310,7 @@ printf '\n'
 
 # By using an API Key, we need to unlock the vault to get a sessionID
 echo "# Unlocking the vault..."
-DEST_SESSION=$(bw unlock "$DEST_PASSWORD" --raw)
+DEST_SESSION=$(bw unlock "$(< $DEST_PASSWORD)" --raw)
 
 if [ -z "$DEST_SESSION" ]; then
     echo "✕ Error: No destination session retrieved. Check your destination credentials and try again."
